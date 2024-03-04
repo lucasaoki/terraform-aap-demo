@@ -1,5 +1,10 @@
 execution-environment/context
 .terraform
 .terraform.*
+*.tfstate
 .DS_Store
 .env
+
+.vscode
+.idea
+ansible_collections

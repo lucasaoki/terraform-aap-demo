@@ -1,0 +1,36 @@
+---
+- name: Deploy resources via Terraform
+  hosts: localhost
+
+  environment:
+    TF_BACKEND_CONFIG_FILE: "{{ backend_config_file | default(lookup('env', 'TF_BACKEND_CONFIG_FILE')) }}"
+    GCE_CREDENTIALS_FILE_PATH: "{{ gcp_credentials_path | default(lookup('env', 'GCE_CREDENTIALS_FILE_PATH')) }}"
+    GCE_PROJECT: "{{ gcp_project | default(lookup('env', 'GCE_PROJECT')) }}"
+  vars:
+    _terraform_operation_list:
+      apply: present
+      destroy: absent
+
+    terraform_operation: apply
+    terraform_backend_type: s3
+
+  tasks:
+    - name: "Terraform {{ terraform_operation }}"
+      cloud.terraform.terraform:
+        project_path: "terraform-{{ terraform_backend_type }}-backend/"
+        state: "{{ _terraform_operation_list[terraform_operation] }}"
+        force_init: true
+        backend_config_files:
+          - "{{ lookup('env', 'TF_BACKEND_CONFIG_FILE') }}"
+        variables:
+          aws_region: "{{ aws_region | default(omit) }}"
+          aws_instance_name: "{{ aws_instance_name | default(omit) }}"
+          aws_subnet_id: "{{ aws_subnet_id }}"
+
+          gcp_credentials_path: "{{ lookup('env', 'GCE_CREDENTIALS_FILE_PATH') }}"
+          gcp_project: "{{ lookup('env', 'GCE_PROJECT') }}"
+          gcp_region: "{{ gcp_region | default(omit) }}"
+          gcp_zone: "{{ gcp_zone | default(omit) }}"
+          gcp_instance_name: "{{ gcp_instance_name | default(omit) }}"
+          gcp_instance_network: "{{ gcp_instance_network | default(omit) }}"
+          gcp_instance_subnet: "{{ gcp_instance_subnet | default(omit) }}"
