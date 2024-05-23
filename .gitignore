@@ -2,6 +2,9 @@ execution-environment/context
 .terraform
 .terraform.*
 *.tfstate
+*.tfstate.backup
+*.tfvars
+*.tfbackend
 .DS_Store
 .env
 
